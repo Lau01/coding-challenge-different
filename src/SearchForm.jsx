@@ -5,15 +5,41 @@ import SearchResults from './SearchResults.jsx';
 
 
 class SearchForm extends Component {
+  constructor() {
+    super();
+    this.state = {
+
+    }
+
+    this.onClickSearch = this.onClickSearch.bind(this);
+  }
+
+  onClickSearch(event) {
+    this.setState({
+      
+    })
+    event.preventDefault();
+  }
+
+
+
   render() {
 
     return (
       <div>
         <form>
-          <input type="text" placeholder="lease id..." />
-          <button type="submit">Search</button>
+          <input
+          type="text"
+          placeholder="Enter a lease ID..."
+
+          />
+          <button
+            type="submit"
+            onClick={this.onClickSearch}
+          >Search
+          </button>
         </form>
-        <SearchResults />
+
       </div>
     );
   }

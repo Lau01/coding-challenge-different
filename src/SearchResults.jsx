@@ -1,60 +1,10 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import './App.css';
-import {getDaysInMonth, daysInFrequency, daysBetweenDates, getDayOfTheWeek, dayToNumber, daysBetwenTwoDayNames, addDaysToDate} from './lib/util.js'
+import {getDaysInMonth, daysInFrequency, daysBetweenDates, getDayOfTheWeek, dayToNumber, daysBetwenTwoDayNames, addDaysToDate, getPayAmount, lastElement, getMonthName, dateWithSuffix} from './lib/util.js'
 
 
-// const dayToNumber = function(day) {
-//   switch(day) {
-//   case 'sunday':
-//     return 0;
-//     break;
-//   case 'monday':
-//     return 1;
-//     break;
-//   case 'tuesday':
-//     return 2;
-//     break;
-//   case 'wednesday':
-//     return 3;
-//     break;
-//   case 'thursday':
-//     return 4;
-//     break;
-//   case 'friday':
-//     return 5;
-//     break;
-//   case 'saturday':
-//     return 6;
-//     break;
-//   }
-// };
-//
-// const daysBetwenTwoDayNames = function(startDay, endDay) {
-//   return Math.abs(dayToNumber(endDay) - dayToNumber(startDay));
-// }
-//
-// const addDaysToDate = function(daysAdded, day, month, year) {
-//   let daysInMonth = getDaysInMonth(month, year);
-//   let endDay = day + daysAdded;
-//   let endMonth = month;
-//
-//   if (endDay > daysInMonth) {
-//     endDay = endDay - daysInMonth;
-//     endMonth += 1;
-//   } else if (endDay < 0) {
-//     // prev month
-//     endDay = getDaysInMonth(month - 1) + endDay;
-//     endMonth -= 1;
-//   }
-//   return {
-//     day: endDay,
-//     month: endMonth,
-//     year: year
-//   };
-// }
-
-class SearchForm extends Component {
+class SearchResults extends Component {
   constructor() {
     super();
     this.state = {
@@ -104,26 +54,26 @@ class SearchForm extends Component {
         endYear,
       } = this.state
 
-      console.log(leaseInfo)
-
       let startDayName = getDayOfTheWeek(startDayNum, startMonthNum, startYear);
       // console.log('starting day number:', startDayNum)
 
       // lease starting day to starting normal payment day
-      let daysBetweenStartAndPay = daysBetwenTwoDayNames(startDayName, leaseInfo.payment_day);
+      let daysInFirstCharge = daysBetwenTwoDayNames(startDayName, leaseInfo.payment_day);
 
-      ////////
+      // The amount of days in the payment frequency.
       let frequencyDays = daysInFrequency(leaseInfo.frequency);
-      // start date for FROM: column
-      let startFromPayDate = addDaysToDate(daysBetweenStartAndPay, startDayNum, startMonthNum, startYear);
-      // start date for TO: column
-      let startToPayDate = addDaysToDate(frequencyDays - 1, startFromPayDate.day, startFromPayDate.month, startFromPayDate.year);
 
-      let totalFullPayments = Math.floor(daysBetweenDates(startFromPayDate.day, startFromPayDate.month, endDayNum, endMonthNum)/frequencyDays);
+      // Start date for FROM: column. Only includes the payment blocks with full payments.
+      let fromColumnDates = addDaysToDate(daysInFirstCharge, startDayNum, startMonthNum, startYear);
+
+      // Start date for TO: column. Only includes the payment blocks with full payments.
+      let toColumnDates = addDaysToDate(frequencyDays - 1, fromColumnDates.day, fromColumnDates.month, fromColumnDates.year);
+
+      let totalFullPayments = Math.floor(daysBetweenDates(fromColumnDates.day, fromColumnDates.month, endDayNum, endMonthNum)/frequencyDays);
 
       //////////////
-      let nextFromDate = startFromPayDate;
-      let nextToDate = startToPayDate;
+      let nextFromDate = fromColumnDates;
+      let nextToDate = toColumnDates;
 
       let fromDatesArray = [];
       let toDatesArray = [];
@@ -155,28 +105,27 @@ class SearchForm extends Component {
         year: endYear
       }
 
-
+      // Add first and last dates for the lease
       fromDatesArray.unshift(startDateObj)
-      // fromDatesArray.push(addDaysToDate(3, startDateObj.day, startDateObj.month, startDateObj.year));
 
+      toDatesArray.unshift(addDaysToDate(daysInFirstCharge - 1, startDateObj.day, startDateObj.month, startDateObj.year));
 
-      toDatesArray.unshift(addDaysToDate(daysBetweenStartAndPay - 1, startDateObj.day, startDateObj.month, startDateObj.year));
-
-      fromDatesArray.push(addDaysToDate(1, toDatesArray[toDatesArray.length - 1].day, toDatesArray[toDatesArray.length - 1].month, toDatesArray[toDatesArray.length - 1].year))
+      fromDatesArray.push(addDaysToDate(1, lastElement(toDatesArray).day, lastElement(toDatesArray).month, lastElement(toDatesArray).year))
 
       toDatesArray.push(endDateObj)
 
-      let daysBetweenLastPayAndEnd = daysBetweenDates(fromDatesArray[fromDatesArray.length - 1].day, fromDatesArray[fromDatesArray.length - 1].month, endDateObj.day, endDateObj.month);
+      // Add first and last day amounts for the lease
+      let daysBetweenLastPayAndEnd = daysBetweenDates(lastElement(fromDatesArray).day, lastElement(fromDatesArray).month, endDateObj.day, endDateObj.month);
 
-      daysArray.unshift(daysBetweenStartAndPay);
+      daysArray.unshift(daysInFirstCharge);
       daysArray.push(daysBetweenLastPayAndEnd);
 
-      let firstPaymentAmount = (daysArray[0]/frequencyDays * leaseInfo.rent).toFixed(1)
-      let lastPaymentAmount = (daysArray[daysArray.length - 1]/frequencyDays * leaseInfo.rent).toFixed(1)
-      amountArray.unshift(firstPaymentAmount);
-      amountArray.push(lastPaymentAmount)
+      // Add first and last payment amounts for the lease
+      let firstPaymentAmount = getPayAmount(daysArray[0], frequencyDays, leaseInfo.rent);
+      let lastPaymentAmount = getPayAmount(lastElement(daysArray), frequencyDays, leaseInfo.rent);
 
-      console.log('==============================')
+      amountArray.unshift(firstPaymentAmount);
+      amountArray.push(lastPaymentAmount);
 
       this.setState({
         fromColumnArray: fromDatesArray,
@@ -210,24 +159,24 @@ class SearchForm extends Component {
     return (
       <div className="container">
         <ul className="column">
-          FROM:
+          <h4>FROM:</h4>
           {fromColumnArray.map(payment =>
             <li>
-              <span> {payment.day}-{payment.month}-{payment.year} </span>
+              <span> {getMonthName(payment.month)}, {dateWithSuffix(payment.day)} {payment.year} </span>
             </li>
           )}
         </ul>
         <ul className="column">
-          TO:
+          <h4>TO:</h4>
           {toColumnArray.map(payment =>
             <li>
-              <span> {payment.day}-{payment.month}-{payment.year} </span>
+              <span> {getMonthName(payment.month)}, {dateWithSuffix(payment.day)} {payment.year} </span>
             </li>
           )}
         </ul>
 
         <ul className="column">
-          DAYS:
+          <h4>DAYS:</h4>
           {daysColumnArray.map(days =>
             <li>
               <span> {days} </span>
@@ -236,7 +185,7 @@ class SearchForm extends Component {
         </ul>
 
         <ul className="column">
-          AMOUNT:
+          <h4>AMOUNT:</h4>
           {amountColumnArray.map(amount =>
             <li>
               <span> ${amount} </span>
@@ -250,4 +199,4 @@ class SearchForm extends Component {
   };
 };
 
-export default SearchForm;
+export default SearchResults;

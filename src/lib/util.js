@@ -31,7 +31,6 @@ export function daysBetweenDates(startDay, startMonth, endDay, endMonth) {
   let totalDays = 0;
 
   if (startMonth === endMonth) {
-    console.log('util', totalDays)
     return totalDays = endDay - startDay;
   }
 
@@ -134,4 +133,32 @@ export function addDaysToDate(daysAdded, day, month, year) {
     month: endMonth,
     year: year
   };
+}
+
+export function getPayAmount(days, frequency, rent) {
+  return (days/frequency * rent).toFixed(1);
+}
+
+export function lastElement(array) {
+  return array[array.length - 1];
+}
+
+export function getMonthName(monthNumber) {
+  const monthNames = ["January", "February", "March", "April", "May","June","July", "August", "September", "October", "November","December"];
+  return monthNames[monthNumber - 1];
+}
+
+export function dateWithSuffix(date) {
+  const i = date % 10,
+      j = date % 100;
+  if (i == 1 && j != 11) {
+      return date + "st";
+  }
+  if (i == 2 && j != 12) {
+      return date + "nd";
+  }
+  if (i == 3 && j != 13) {
+      return date + "rd";
+  }
+  return date + "th";
 }

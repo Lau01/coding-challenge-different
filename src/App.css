@@ -9,9 +9,13 @@ body {
 }
 
 .column {
-  border: 1px solid rgb(55,55,55)
+
 }
 
 .column > li {
   list-style: none;
+}
+
+.column > li > span {
+  line-height: 1.5em;
 }

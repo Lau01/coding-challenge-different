@@ -119,25 +119,28 @@ class SearchForm extends Component {
       // start date for TO: column
       let startToPayDate = addDaysToDate(frequencyDays - 1, startFromPayDate.day, startFromPayDate.month, startFromPayDate.year);
 
-      let totalFullPayments = daysBetweenDates(startFromPayDate.day, startFromPayDate.month, endDayNum, endMonthNum);
+      let totalFullPayments = Math.floor(daysBetweenDates(startFromPayDate.day, startFromPayDate.month, endDayNum, endMonthNum)/frequencyDays);
 
       //////////////
       let nextFromDate = startFromPayDate;
       let nextToDate = startToPayDate;
 
-      let fromDatesArray = [startFromPayDate];
-      let toDatesArray = [nextToDate];
+      let fromDatesArray = [];
+      let toDatesArray = [];
 
-      let daysArray = [frequencyDays];
-      let amountArray = [leaseInfo.rent];
-      while ((nextFromDate.month < endMonthNum) || (nextFromDate.day < endDayNum)) {
+      let daysArray = [];
+      let amountArray = [];
+      let i = 0;
+      while (i < totalFullPayments - 1) {
         nextFromDate = addDaysToDate(frequencyDays, nextFromDate.day, nextFromDate.month, nextFromDate.year);
         fromDatesArray.push(nextFromDate);
+
         nextToDate = addDaysToDate(frequencyDays - 1, nextFromDate.day, nextFromDate.month, nextFromDate.year);
         toDatesArray.push(nextToDate);
 
         daysArray.push(frequencyDays);
-        amountArray.push(leaseInfo.rent)
+        amountArray.push(leaseInfo.rent);
+        i++;
       }
 
       let startDateObj = {
@@ -156,19 +159,22 @@ class SearchForm extends Component {
       fromDatesArray.unshift(startDateObj)
       // fromDatesArray.push(addDaysToDate(3, startDateObj.day, startDateObj.month, startDateObj.year));
 
-      let daysBetweenLastPayAndEnd = daysBetweenDates(fromDatesArray[fromDatesArray.length - 1].day, fromDatesArray[fromDatesArray.length - 1].month, endDateObj.day, endDateObj.month);
-
 
       toDatesArray.unshift(addDaysToDate(daysBetweenStartAndPay - 1, startDateObj.day, startDateObj.month, startDateObj.year));
 
       fromDatesArray.push(addDaysToDate(1, toDatesArray[toDatesArray.length - 1].day, toDatesArray[toDatesArray.length - 1].month, toDatesArray[toDatesArray.length - 1].year))
+
       toDatesArray.push(endDateObj)
 
-
+      let daysBetweenLastPayAndEnd = daysBetweenDates(fromDatesArray[fromDatesArray.length - 1].day, fromDatesArray[fromDatesArray.length - 1].month, endDateObj.day, endDateObj.month);
 
       daysArray.unshift(daysBetweenStartAndPay);
       daysArray.push(daysBetweenLastPayAndEnd);
-      amountArray.push()
+
+      let firstPaymentAmount = (daysArray[0]/frequencyDays * leaseInfo.rent).toFixed(1)
+      let lastPaymentAmount = (daysArray[daysArray.length - 1]/frequencyDays * leaseInfo.rent).toFixed(1)
+      amountArray.unshift(firstPaymentAmount);
+      amountArray.push(lastPaymentAmount)
 
       console.log('==============================')
 
@@ -229,14 +235,14 @@ class SearchForm extends Component {
           )}
         </ul>
 
-        {/* <ul className="column">
+        <ul className="column">
           AMOUNT:
-          {amountColumnArray.map(payment =>
+          {amountColumnArray.map(amount =>
             <li>
-              <span> ${rent} </span>
+              <span> ${amount} </span>
             </li>
           )}
-        </ul> */}
+        </ul>
 
 
       </div>

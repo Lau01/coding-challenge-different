@@ -1,3 +1,17 @@
 body {
   margin: 40px;
 }
+
+.container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-column-gap: 5px;
+}
+
+.column {
+  border: 1px solid rgb(55,55,55)
+}
+
+.column > li {
+  list-style: none;
+}

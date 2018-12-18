@@ -12,14 +12,6 @@ class SearchResults extends Component {
     super();
     this.state = {
       leaseInfo: {},
-      startDayNum: null,
-      startMonthNum: null,
-      startYear: null,
-      endDayNum: null,
-      endMonthNum: null,
-      endYear: null,
-      startNormalPayDate: null,
-      endNormalPayDate: null,
       fromColumnArray: [],
       toColumnArray: [],
       daysColumnArray: [],
@@ -34,8 +26,6 @@ class SearchResults extends Component {
 
     axios.get(`https://hiring-task-api.herokuapp.com/v1/leases/${leaseId}`)
     .then(res => {
-      let startDateArray = res.data.start_date.split("-");
-      let endDateArray = res.data.end_date.split("-");
       this.setState({
         leaseInfo: res.data,
       })

@@ -26,36 +26,36 @@ export function daysInFrequency(frequency) {
 }
 
 // Assumes start and end years are the same at the moment
-export function daysBetweenDates(startDay, startMonth, endDay, endMonth) {
+export function daysBetweenDates(startDateObj, endDateObj) {
   let year = 2018;
   let totalDays = 0;
 
-  if (startMonth === endMonth) {
-    return totalDays = endDay - startDay;
+  if (startDateObj.month === endDateObj.month) {
+    return totalDays = endDateObj.day - startDateObj.day;
   }
 
-  let daysInStartMonth = getDaysInMonth(startMonth, year);
-  let daysToEndOfStartMonth = daysInStartMonth - startDay;
+  let daysInStartMonth = getDaysInMonth(startDateObj.month, year);
+  let daysToEndOfStartMonth = daysInStartMonth - startDateObj.day;
 
   // add days to the end of current month
   totalDays += daysToEndOfStartMonth;
+
   // add days for the months to the start of the end month
-  for (let i = parseInt(startMonth) + 1; i < parseInt(endMonth); i++) {
+  for (let i = startDateObj.month + 1; i < endDateObj.month; i++) {
     totalDays += getDaysInMonth(i, year);
   }
 
   // add the rest of the days left in the last month
 
-  return totalDays += endDay;
+  return totalDays += endDateObj.day;
 }
 
-export function getDayOfTheWeek(day, month, year) {
-  let lastTwoDigitsYear = parseInt(year.toString().slice(2));
-  let century = parseInt(year.toString().slice(0, 2));
+export function getDayOfTheWeek(dateObj) {
+  let lastTwoDigitsYear = parseInt(dateObj.year.toString().slice(2));
+  let century = parseInt(dateObj.year.toString().slice(0, 2));
 
   // Zeller's Rule
-  let f = day + Math.floor(((13 * month) - 1) / 5) + lastTwoDigitsYear + Math.floor(lastTwoDigitsYear / 4) + Math.floor(century / 4) - (2 * century);
-  console.log('f value:', f);
+  let f = dateObj.day + Math.floor(((13 * dateObj.month) - 1) / 5) + lastTwoDigitsYear + Math.floor(lastTwoDigitsYear / 4) + Math.floor(century / 4) - (2 * century);
   let remainder = f % 7
 
   switch(remainder) {
@@ -115,28 +115,24 @@ export function daysBetwenTwoDayNames(startDay, endDay) {
   return Math.abs(dayToNumber(endDay) - dayToNumber(startDay));
 }
 
-export function addDaysToDate(daysAdded, day, month, year) {
-  let daysInMonth = getDaysInMonth(month, year);
-  let endDay = day + daysAdded;
-  let endMonth = month;
+export function addDaysToDate(daysAdded, dateObj) {
+  let daysInMonth = getDaysInMonth(dateObj.month, dateObj.year);
+  let endDay = dateObj.day + daysAdded;
+  let endMonth = dateObj.month;
   if (endDay > daysInMonth) {
     endDay = endDay - daysInMonth;
     endMonth += 1;
   } else if (endDay < 0) {
     // prev month
-    endDay = getDaysInMonth(month - 1) + endDay;
+    endDay = getDaysInMonth(dateObj.month - 1) + endDay;
     endMonth -= 1;
   }
 
   return {
     day: endDay,
     month: endMonth,
-    year: year
+    year: dateObj.year
   };
-}
-
-export function getPayAmount(days, frequency, rent) {
-  return (days/frequency * rent).toFixed(1);
 }
 
 export function lastElement(array) {
@@ -144,10 +140,12 @@ export function lastElement(array) {
 }
 
 export function getMonthName(monthNumber) {
-  const monthNames = ["January", "February", "March", "April", "May","June","July", "August", "September", "October", "November","December"];
+  const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   return monthNames[monthNumber - 1];
 }
 
+// Post from Stack Overflow: https://stackoverflow.com/a/13627586
+// Returns the date with the appropriate suffix given the rules detailed here: https://en.wikipedia.org/wiki/Ordinal_indicator#Other_suffixes
 export function dateWithSuffix(date) {
   const i = date % 10,
       j = date % 100;
@@ -161,4 +159,14 @@ export function dateWithSuffix(date) {
       return date + "rd";
   }
   return date + "th";
+}
+
+export function getDateObj(date) {
+  const d = new Date(date);
+  const day = d.getDate();
+  // getMonth() method starts at 0. Add 1 to get the same as calendar number.
+  const month = d.getMonth() + 1;
+  const year = d.getFullYear();
+
+  return {day, month, year}
 }

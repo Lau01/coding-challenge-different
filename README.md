@@ -1,5 +1,5 @@
 # Rental Payments Different Coding Challenge
-A coding challenge from the company ':Different'. Created using `create-react-app `.
+A coding challenge from the company ':Different'. Created using `create-react-app`.
 
 ### Instructions
 1. In the command line interface, inside the directory, run `npm start`.

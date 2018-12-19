@@ -10,3 +10,14 @@ Click the tenants to view their lease info:
 
 Alternatively, you can search a particular lease by its ID by typing in the url:
 [http://localhost:3000/#/lease/:id](http://localhost:3000/#/lease/:id) where `:id` is the particular lease ID you want to browse.
+
+### Code overview
+* All the logic for the lease column data (From, To, Days, Amount) can be found in their respective files in the `/lib` folder.
+* `util.js` contains utility functions to help manipulate dates and other small helper functions.
+
+### Installed Dependencies
+```
+axios
+react-router-dom
+react-spinners
+```

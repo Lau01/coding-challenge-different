@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import SearchForm from './SearchForm';
 import SearchResults from './SearchResults';
+import ShowTenants from './ShowTenants';
 import './App.css';
 
 
@@ -9,8 +9,7 @@ class App extends Component {
     return (
       <div>
         <h1>Lease Searcher</h1>
-        <SearchResults />
-
+        <ShowTenants />
       </div>
     );
   }

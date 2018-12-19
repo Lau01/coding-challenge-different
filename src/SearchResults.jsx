@@ -19,17 +19,42 @@ class SearchResults extends Component {
     }
   }
 
-  componentDidMount () {
-    let paramsString = window.location.search
-    let searchParams = new URLSearchParams(paramsString);
-    let leaseId = searchParams.get("leaseId");
+  componentDidUpdate(prevProps) {
+    if (this.props.match.params.id !== prevProps.match.params.id) {
+      axios.get(`https://hiring-task-api.herokuapp.com/v1/leases/${this.props.match.params.id}`)
+      .then(res => {
+        this.setState({
+          leaseInfo: res.data,
+        })
+        console.log(this.state.leaseInfo)
+        let fromArray = generateFromColumn(this.state.leaseInfo);
+        let toArray = generateToColumn(this.state.leaseInfo);
+        let daysArray = generateDaysColumn(this.state.leaseInfo, fromArray);
+        let amountArray = generateAmountColumn(this.state.leaseInfo, daysArray)
 
-    axios.get(`https://hiring-task-api.herokuapp.com/v1/leases/${leaseId}`)
+
+        this.setState({
+          fromColumnArray: fromArray,
+          toColumnArray: toArray,
+          daysColumnArray: daysArray,
+          amountColumnArray: amountArray
+        })
+      })
+      .catch(err => {
+        console.warn(err)
+      })
+    }
+  }
+
+  componentDidMount () {
+
+
+    axios.get(`https://hiring-task-api.herokuapp.com/v1/leases/${this.props.match.params.id}`)
     .then(res => {
       this.setState({
         leaseInfo: res.data,
       })
-
+      console.log(this.state.leaseInfo)
       let fromArray = generateFromColumn(this.state.leaseInfo);
       let toArray = generateToColumn(this.state.leaseInfo);
       let daysArray = generateDaysColumn(this.state.leaseInfo, fromArray);
@@ -49,14 +74,6 @@ class SearchResults extends Component {
   }
 
   render() {
-    const {
-      id,
-      start_date,
-      end_date,
-      rent,
-      frequency,
-      payment_day,
-    } = this.state.leaseInfo
 
     const {
       fromColumnArray,
@@ -66,43 +83,46 @@ class SearchResults extends Component {
     } = this.state
 
     return (
-      <div className="container">
-        <ul className="column">
-          <h4>FROM:</h4>
-          {fromColumnArray.map(payment =>
-            <li>
-              <span> {getMonthName(payment.month)}, {dateWithSuffix(payment.day)} {payment.year} </span>
-            </li>
-          )}
-        </ul>
-        <ul className="column">
-          <h4>TO:</h4>
-          {toColumnArray.map(payment =>
-            <li>
-              <span> {getMonthName(payment.month)}, {dateWithSuffix(payment.day)} {payment.year} </span>
-            </li>
-          )}
-        </ul>
+      <div>
+        <h2>ID: {this.props.match.params.id}</h2>
+        <div className="container">
+          <ul className="column">
+            <h4>FROM:</h4>
+            {fromColumnArray.map(payment =>
+              <li>
+                <span> {getMonthName(payment.month)}, {dateWithSuffix(payment.day)} {payment.year} </span>
+              </li>
+            )}
+          </ul>
+          <ul className="column">
+            <h4>TO:</h4>
+            {toColumnArray.map(payment =>
+              <li>
+                <span> {getMonthName(payment.month)}, {dateWithSuffix(payment.day)} {payment.year} </span>
+              </li>
+            )}
+          </ul>
 
-        <ul className="column">
-          <h4>DAYS:</h4>
-          {daysColumnArray.map(days =>
-            <li>
-              <span> {days} </span>
-            </li>
-          )}
-        </ul>
+          <ul className="column">
+            <h4>DAYS:</h4>
+            {daysColumnArray.map(days =>
+              <li>
+                <span> {days} </span>
+              </li>
+            )}
+          </ul>
 
-        <ul className="column">
-          <h4>AMOUNT:</h4>
-          {amountColumnArray.map(amount =>
-            <li>
-              <span> ${amount} </span>
-            </li>
-          )}
-        </ul>
+          <ul className="column">
+            <h4>AMOUNT:</h4>
+            {amountColumnArray.map(amount =>
+              <li>
+                <span> ${amount} </span>
+              </li>
+            )}
+          </ul>
 
 
+        </div>
       </div>
     );
   };

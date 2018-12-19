@@ -2,14 +2,13 @@ body {
   margin: 40px;
 }
 
+/*
+=========== SearchResults.jsx
+                           */
 .container {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-column-gap: 5px;
-}
-
-.column {
-
 }
 
 .column > li {
@@ -18,4 +17,37 @@ body {
 
 .column > li > span {
   line-height: 1.5em;
+}
+
+/*
+=========== ShowTenants.jsx
+                           */
+
+.tenantList > li {
+  list-style: none;
+}
+
+/*
+=========== TenantButton.jsx
+                           */
+.tenantButton {
+  border: none;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.10);
+  margin-top: 20px;
+  border-radius: 20px;
+  -webkit-transition: background-color 0.3s;
+  -moz-transition: background-color 0.3s;
+  -o-transition: background-color 0.3s;
+  transition: background-color 0.3s;
+}
+
+.tenantButton:hover {
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.30);
+}
+
+.tenantButton > div {
+  line-height: 1.3em;
+  font-size: 1.2em;
 }

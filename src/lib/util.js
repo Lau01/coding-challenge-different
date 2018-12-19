@@ -1,3 +1,4 @@
+// Function to obtain the amount of days in a month.
 export function getDaysInMonth(month, year) {
   if (month % 2 !== 0) {
     return 31; // odd month
@@ -10,7 +11,7 @@ export function getDaysInMonth(month, year) {
   }
 };
 
-
+// Convert the frequency string to the amount of days the frequency represents
 export function daysInFrequency(frequency) {
   switch(frequency) {
     case 'weekly':
@@ -25,31 +26,18 @@ export function daysInFrequency(frequency) {
   }
 }
 
-// Assumes start and end years are the same at the moment
+// Subtract two dates which gives a millisecond value. Convert value to days.
+// Details obtained in this Stack Overflow post: https://stackoverflow.com/questions/542938/how-do-i-get-the-number-of-days-between-two-dates-in-javascript/543152#543152
 export function daysBetweenDates(startDateObj, endDateObj) {
-  let year = 2018;
-  let totalDays = 0;
+  // turn date objects back to string
+  let first = new Date(startDateObj.year, startDateObj.month, startDateObj.day);
+  let second = new Date(endDateObj.year, endDateObj.month, endDateObj.day);
 
-  if (startDateObj.month === endDateObj.month) {
-    return totalDays = endDateObj.day - startDateObj.day;
-  }
-
-  let daysInStartMonth = getDaysInMonth(startDateObj.month, year);
-  let daysToEndOfStartMonth = daysInStartMonth - startDateObj.day;
-
-  // add days to the end of current month
-  totalDays += daysToEndOfStartMonth;
-
-  // add days for the months to the start of the end month
-  for (let i = startDateObj.month + 1; i < endDateObj.month; i++) {
-    totalDays += getDaysInMonth(i, year);
-  }
-
-  // add the rest of the days left in the last month
-
-  return totalDays += endDateObj.day;
+  // Convert and return value in days.
+  return Math.round((second-first)/(1000*60*60*24));
 }
 
+// Function to get the named day of the week given a date.
 export function getDayOfTheWeek(dateObj) {
   let lastTwoDigitsYear = parseInt(dateObj.year.toString().slice(2));
   let century = parseInt(dateObj.year.toString().slice(0, 2));
@@ -84,7 +72,7 @@ export function getDayOfTheWeek(dateObj) {
 
 }; // getDayOfTheWeek
 
-
+// Convert the named day to a number
 export function dayToNumber(day) {
   switch(day) {
   case 'sunday':
@@ -111,34 +99,31 @@ export function dayToNumber(day) {
   }
 };
 
+// Gives the days between two named days e.g. Monday to Wednesday will return 3.
 export function daysBetwenTwoDayNames(startDay, endDay) {
   return Math.abs(dayToNumber(endDay) - dayToNumber(startDay));
 }
 
+// Function to add days to a date object. Returns a new date object.
 export function addDaysToDate(daysAdded, dateObj) {
-  let daysInMonth = getDaysInMonth(dateObj.month, dateObj.year);
-  let endDay = dateObj.day + daysAdded;
-  let endMonth = dateObj.month;
-  if (endDay > daysInMonth) {
-    endDay = endDay - daysInMonth;
-    endMonth += 1;
-  } else if (endDay < 0) {
-    // prev month
-    endDay = getDaysInMonth(dateObj.month - 1) + endDay;
-    endMonth -= 1;
-  }
-
-  return {
-    day: endDay,
-    month: endMonth,
-    year: dateObj.year
-  };
+  // Convert date to javascript date
+  let date = new Date(dateObj.year, dateObj.month, dateObj.day);
+  // add days to the date
+  date.setDate(date.getDate() + daysAdded);
+  // return the new date object with the new values
+  let day = date.getDate();
+  let month = date.getMonth();
+  let year = date.getFullYear();
+  let newDateObj = {day, month, year}
+  return newDateObj;
 }
 
+// Small function to obtain the last element in an array
 export function lastElement(array) {
   return array[array.length - 1];
 }
 
+// Function to get the named month given a month number
 export function getMonthName(monthNumber) {
   const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   return monthNames[monthNumber - 1];
@@ -161,6 +146,7 @@ export function dateWithSuffix(date) {
   return date + "th";
 }
 
+// Function to return a date object when given a date string
 export function getDateObj(date) {
   const d = new Date(date);
   const day = d.getDate();

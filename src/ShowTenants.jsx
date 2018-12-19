@@ -40,7 +40,11 @@ class ShowTenants extends Component {
   }
 
   render() {
-
+    const {
+      tenantArray,
+      loading
+    } = this.state
+    
     return (
       <div>
         <h2>List of Tenants</h2>

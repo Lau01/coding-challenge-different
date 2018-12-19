@@ -23,7 +23,6 @@ class SearchResults extends Component {
 
   componentDidUpdate(prevProps) {
     if (this.props.match.params.id !== prevProps.match.params.id) {
-
       this.setState({loading: true}, () => {
         axios.get(`https://hiring-task-api.herokuapp.com/v1/leases/${this.props.match.params.id}`)
         .then(res => {
@@ -52,7 +51,6 @@ class SearchResults extends Component {
   };
 
   componentDidMount () {
-
     this.setState({loading: true}, () => {
       axios.get(`https://hiring-task-api.herokuapp.com/v1/leases/${this.props.match.params.id}`)
       .then(res => {
@@ -85,13 +83,14 @@ class SearchResults extends Component {
       fromColumnArray,
       toColumnArray,
       daysColumnArray,
-      amountColumnArray
+      amountColumnArray,
+      loading
     } = this.state
 
     return (
       <div>
         <h2>ID: {this.props.match.params.id}</h2>
-        {this.state.loading ?
+        {loading ?
           <BarLoader
           width="150"
           color={'#89dbd1'}
